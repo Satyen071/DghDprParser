@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.poi.hpsf.Array;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,6 +47,56 @@ public class TestDprParser {
 		  }
 		}
 
+	public static List<MyObject> getFieldLatestData(XSSFSheet sheet, SimpleDateFormat formatter) {
+		List<MyObject> list = new ArrayList<MyObject>();
+
+		for(int i=0;i<sheet.getPhysicalNumberOfRows();i++) {
+			  Row row1 = sheet.getRow(i);
+		//	  System.out.println(row1.getCell(3).getCellType());
+			  if(row1.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY") &&
+					  row1.getCell(0).getStringCellValue().equalsIgnoreCase("ALLORA" )) {
+				  		try {
+				  			MyObject obj = new MyObject();
+				  			obj.setDateTime(formatter.parse(row1.getCell(3).getStringCellValue()));
+							list.add(obj);
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}  
+			  }
+			  
+		}
+		  Collections.sort(list,Collections.reverseOrder());
+		  return list;
+	}
+	
+	
+	public static XSSFSheet removeEmptyRows(XSSFSheet sheet) {
+	    Boolean isRowEmpty = Boolean.FALSE;
+	    for(int i = 0; i <= sheet.getLastRowNum(); i++){
+	      if(sheet.getRow(i)==null || sheet.getRow(i).getLastCellNum()==-1){
+	        isRowEmpty=true;
+	        sheet.shiftRows(i + 1, sheet.getLastRowNum()+1, -1);
+	        i--;
+	        continue;
+	      }
+//	      for(int j =0; j<sheet.getRow(i).getLastCellNum();j++){
+//	        if(sheet.getRow(i).getCell(j).getCellType() == CellType.BLANK || 
+//	        sheet.getRow(i).getCell(j).toString().trim().equals("")){
+//	          isRowEmpty=true;
+//	        }else {
+//	          isRowEmpty=false;
+//	          break;
+//	        }
+//	      }
+//	      if(isRowEmpty==true){
+//	        sheet.shiftRows(i + 1, sheet.getLastRowNum()+1, -1);
+//	        i--;
+//	      }
+	    }
+	    return sheet;
+	  }
+	
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
 		// TODO Auto-generated method stub
 		
@@ -113,30 +165,12 @@ public class TestDprParser {
 	      cellNonAssociatedGas.setCellStyle(cellStyle);
 	      cellNonAssociatedGas.setCellValue("NON_ASSOCIATED_GAS_M3");
 
-System.out.println(sheet.getPhysicalNumberOfRows());
-
-			List<MyObject> list = new ArrayList<MyObject>();
+			System.out.println(sheet.getPhysicalNumberOfRows());
+//			List<MyObject> list = new ArrayList<MyObject>();
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-			//String formattedDate = formatter.format();
-			for(int i=0;i<sheet.getPhysicalNumberOfRows();i++) {
-				  Row row1 = sheet.getRow(i);
-			//	  System.out.println(row1.getCell(3).getCellType());
-				  if(row1.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY") &&
-						  row1.getCell(0).getStringCellValue().equalsIgnoreCase("ALLORA" )) {
-					  		try {
-					  			MyObject obj = new MyObject();
-					  			obj.setDateTime(formatter.parse(row1.getCell(3).getStringCellValue()));
-								list.add(obj);
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}  
-				  }else {
-					  continue;
-				  }
-				  
-			}
-			Collections.sort(list,Collections.reverseOrder());
+			
+			List<MyObject> list = getFieldLatestData(sheet,formatter);
+			
 	      for(int k=1;k<sheet.getPhysicalNumberOfRows();k++) {
 //	    	  System.out.println(rw.getCell(0));
 	    	  Row rw = sheet.getRow(k);
@@ -169,8 +203,6 @@ System.out.println(sheet.getPhysicalNumberOfRows());
 		    				  
 		    			  }
 		    			  
-		    		  }else {
-		    			  continue;
 		    		  }
 		    		  
 		    	  }
@@ -191,6 +223,7 @@ System.out.println(sheet.getPhysicalNumberOfRows());
     		});
     	  System.out.println(list.get(0).getDateTime());
     	  System.out.println(sheet1.getPhysicalNumberOfRows());
+    	  sheet1 = TestDprParser.removeEmptyRows(sheet1);
 	      
 	      FileOutputStream out = new FileOutputStream("DghDpr.xlsx");
 	      try {
