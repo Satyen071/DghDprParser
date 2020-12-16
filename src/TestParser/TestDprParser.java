@@ -47,14 +47,14 @@ public class TestDprParser {
 		  }
 		}
 
-	public static List<MyObject> getFieldLatestData(XSSFSheet sheet, SimpleDateFormat formatter) {
+	public static List<MyObject> getFieldLatestData(XSSFSheet sheet, SimpleDateFormat formatter,String fieldName) {
 		List<MyObject> list = new ArrayList<MyObject>();
 
 		for(int i=0;i<sheet.getPhysicalNumberOfRows();i++) {
 			  Row row1 = sheet.getRow(i);
 		//	  System.out.println(row1.getCell(3).getCellType());
-			  if(row1.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY") &&
-					  row1.getCell(0).getStringCellValue().equalsIgnoreCase("ALLORA" )) {
+			  if(row1.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY") && 
+					 row1.getCell(0).getStringCellValue().equalsIgnoreCase(fieldName )) {
 				  		try {
 				  			MyObject obj = new MyObject();
 				  			obj.setDateTime(formatter.parse(row1.getCell(3).getStringCellValue()));
@@ -63,7 +63,8 @@ public class TestDprParser {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}  
-			  }
+					 }
+			  
 			  
 		}
 		  Collections.sort(list,Collections.reverseOrder());
@@ -103,7 +104,7 @@ public class TestDprParser {
 		 FileInputStream fis;
 		 XSSFWorkbook wb = null;
 		try {
-			fis = new FileInputStream(new File("/home/logicladder/Downloads/DPR_Dump_07-12-2020.xlsx"));
+			fis = new FileInputStream(new File("/home/logicladder/Downloads/DPRDump15Dec.xlsx"));
 			wb = new XSSFWorkbook(fis);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -112,7 +113,7 @@ public class TestDprParser {
 	      
 	      XSSFSheet sheet = wb.getSheetAt(0);
 	      
-	      XSSFWorkbook workbook = new XSSFWorkbook();
+	        XSSFWorkbook workbook = new XSSFWorkbook();
 	        XSSFSheet sheet1 = workbook.createSheet("DghDpr");
 	      
 	      FormulaEvaluator formulaEvaluator=wb.getCreationHelper().createFormulaEvaluator();
@@ -168,62 +169,56 @@ public class TestDprParser {
 			System.out.println(sheet.getPhysicalNumberOfRows());
 //			List<MyObject> list = new ArrayList<MyObject>();
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yy");
+			String[] fieldName = {"AAP-ON-94/1","ALLORA","ASJOL","BAKROL","BAOLA","BHANDUT","BOKARO","CAMBAY","CB-ON/2","CB-ON/3", "CB-ON/7", 
+					"CB-ONN-2000/1","CB-ONN-2001/1","CB-ONN-2002/3","CB-ONN-2003/1" 
+					,"CB-ONN-2003/2","CB-ONN-2004/1","CB-ONN-2004/2",
+					"CB-ONN-2004/3","CB-ONN-2005/9","CB-OS/2","CB-OSN-2003/1",
+					"CY-ONN-2002/2","DHOLASAN","DHOLKA","HAZIRA","JHARIA","KANAWARA","KARJISAN","KG-DWN-98/2",
+					"KG-ONN-2003/1","KG-OSN-2001/3","KHARSANG","LOHAR","MODHERA", 
+					"N.BALOL","NORTH KATHANA","OGNAJ","PY-1","RANIGANJ EAST","RANIGUNJ SOUTH","RAVVA","RJ-ON/6","RJ-ON-90/1",
+					"SOHAGPUR EAST","SOHAGPUR WEST","UNAWA","WAVEL" };
+			List<MyObject> list = new ArrayList<TestDprParser.MyObject>();
+			for(String str:fieldName) {
+				
 			
-			List<MyObject> list = getFieldLatestData(sheet,formatter);
-			
+			 list = getFieldLatestData(sheet,formatter,str);
+			System.out.println(list.get(0).getDateTime());
 	      for(int k=1;k<sheet.getPhysicalNumberOfRows();k++) {
-//	    	  System.out.println(rw.getCell(0));
 	    	  Row rw = sheet.getRow(k);
-	    	  Row row1 = sheet1.createRow(++rowCount);
-	    	  int columnCount = 0;
-//	    	  rw.getCell(0);
-//	    	  for(Cell cl:rw) {
-//	    		Cell cell = row1.createCell(++columnCount);
-//	    		if(rw.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY")) {
-//	    		if(rw.getCell(0).getCellType() == CellType.STRING)
-//	    		cell.setCellValue(rw.getCell(0).toString());
-//	    		}else {
-//	    			continue;
-//	    		}
 	    	  Calendar cal = Calendar.getInstance();
 	    	  cal.setTime(list.get(0).getDateTime());
-	    	  System.out.println(formatter.format(cal.getTime()));
 	    	  String formatedDate = formatter.format(cal.getTime());
-	    	  System.out.println(formatedDate);
-	    	  if( formatedDate.equalsIgnoreCase(rw.getCell(3).getStringCellValue()) && rw.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY")) {
-	    		 
-	    		  for(int i=0;i<rw.getPhysicalNumberOfCells();i++) {
-		    		  Cell cell = row1.createCell(i);
-		    		  if(rw.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY")) {
-		    			  if(rw.getCell(0).getCellType() == CellType.STRING ) {
-		    				 
+	    	  if( formatedDate.equalsIgnoreCase(rw.getCell(3).getStringCellValue()) 
+	    			  && rw.getCell(2).getStringCellValue().equalsIgnoreCase("ACTUAL PRODUCTION FOR THE DAY")
+	    			  && rw.getCell(0).getStringCellValue().equalsIgnoreCase(str.trim() )) {
+	    		  		System.out.println(str);
+	    			  System.out.println(rw.getCell(3).getStringCellValue());
+	    			  Row row1 = sheet1.createRow(++rowCount);
+	    			  	for(int i=0;i<rw.getPhysicalNumberOfCells();i++) {
+	    			  		
+		    		  			Cell cell = row1.createCell(i);
 		    				  	cell.setCellValue(rw.getCell(i).toString());
-		    				  
-//		    					  cell.setCellValue(rw.getCell(i).toString());
-		    				  
-		    			  }
 		    			  
-		    		  }
+	    			  	}
 		    		  
-		    	  }
 	    	  }
-	    	  
-	    	
-////	    	  
 	      }
+	}
 	      
 	      
     	  
-    	  System.out.println(list.get(0).getDateTime());
+//    	  System.out.println(list.get(0).getDateTime());
     	  
-    	  Collections.sort(list, new Comparator<MyObject>() {
-    		  public int compare(MyObject o1, MyObject o2) {
-    		      return o1.getDateTime().compareTo(o2.getDateTime());
-    		  }
-    		});
-    	  System.out.println(list.get(0).getDateTime());
+//    	  Collections.sort(list, new Comparator<MyObject>() {
+//    		  public int compare(MyObject o1, MyObject o2) {
+//    		      return o1.getDateTime().compareTo(o2.getDateTime());
+//    		  }
+//    		});
+//    	  System.out.println(list.get(0).getDateTime());
     	  System.out.println(sheet1.getPhysicalNumberOfRows());
-    	  sheet1 = TestDprParser.removeEmptyRows(sheet1);
+//    	  XSSFWorkbook workbook1 = new XSSFWorkbook();
+//	        XSSFSheet sheet2 = workbook1.createSheet("DghDpr1");
+    	   TestDprParser.removeEmptyRows(sheet1);
 	      
 	      FileOutputStream out = new FileOutputStream("DghDpr.xlsx");
 	      try {
