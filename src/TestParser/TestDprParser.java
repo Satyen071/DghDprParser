@@ -104,7 +104,7 @@ public class TestDprParser {
 		 FileInputStream fis;
 		 XSSFWorkbook wb = null;
 		try {
-			fis = new FileInputStream(new File("/home/logicladder/Downloads/DPRDump15Dec.xlsx"));
+			fis = new FileInputStream(new File("/home/logicladder/Downloads/DPRDump19Jan2021.xlsx"));
 			wb = new XSSFWorkbook(fis);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -173,7 +173,7 @@ public class TestDprParser {
 					"CB-ONN-2000/1","CB-ONN-2001/1","CB-ONN-2002/3","CB-ONN-2003/1" 
 					,"CB-ONN-2003/2","CB-ONN-2004/1","CB-ONN-2004/2",
 					"CB-ONN-2004/3","CB-ONN-2005/9","CB-OS/2","CB-OSN-2003/1",
-					"CY-ONN-2002/2","DHOLASAN","DHOLKA","HAZIRA","JHARIA","KANAWARA","KARJISAN","KG-DWN-98/2",
+					"CY-ONN-2002/2","DHOLASAN","DHOLKA","HAZIRA","JHARIA","KANAWARA","KARJISAN","KG-DWN-98/2","KG-DWN-98/3",
 					"KG-ONN-2003/1","KG-OSN-2001/3","KHARSANG","LOHAR","MODHERA", 
 					"N.BALOL","NORTH KATHANA","OGNAJ","PY-1","RANIGANJ EAST","RANIGUNJ SOUTH","RAVVA","RJ-ON/6","RJ-ON-90/1",
 					"SOHAGPUR EAST","SOHAGPUR WEST","UNAWA","WAVEL" };
@@ -182,8 +182,10 @@ public class TestDprParser {
 				
 			
 			 list = getFieldLatestData(sheet,formatter,str);
-			System.out.println(list.get(0).getDateTime());
+//			System.out.println(list.get(0).getDateTime());
+			if(list.size()>0)
 	      for(int k=1;k<sheet.getPhysicalNumberOfRows();k++) {
+//	    	  System.out.println(list.get(0).getDateTime());
 	    	  Row rw = sheet.getRow(k);
 	    	  Calendar cal = Calendar.getInstance();
 	    	  cal.setTime(list.get(0).getDateTime());
@@ -205,15 +207,6 @@ public class TestDprParser {
 	      }
 	}
 	      
-	      
-    	  
-//    	  System.out.println(list.get(0).getDateTime());
-    	  
-//    	  Collections.sort(list, new Comparator<MyObject>() {
-//    		  public int compare(MyObject o1, MyObject o2) {
-//    		      return o1.getDateTime().compareTo(o2.getDateTime());
-//    		  }
-//    		});
 //    	  System.out.println(list.get(0).getDateTime());
     	  System.out.println(sheet1.getPhysicalNumberOfRows());
 //    	  XSSFWorkbook workbook1 = new XSSFWorkbook();
